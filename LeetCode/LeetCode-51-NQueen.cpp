@@ -1,42 +1,39 @@
+// N 皇后
 class Solution {
+private:
+    vector<vector<string>> result_;
+
+    bool check(const vector<string>& grid, const int row, const int col) {
+        int n = grid.size();
+        for (int i = 1; i <= row; ++i) {
+            if (grid[row - i][col] == 'Q' || // 检查竖向上方
+                col - i >= 0 && grid[row - i][col - i] == 'Q' || // 检查左斜上方
+                col + i < n && grid[row - i][col + i] == 'Q') {  // 检查右斜上方
+                return false;
+            }
+        }
+        return true;
+    }
+
+    void dfs(vector<string>& grid, int row) {
+        int n = grid.size();
+        if (row == n) {
+            result_.emplace_back(grid);
+        }
+
+        for (int i = 0; i < n; ++i) {
+            if (check(grid, row, i)) {
+                grid[row][i] = 'Q';
+                dfs(grid, row + 1);
+                grid[row][i] = '.';
+            }
+        }
+    }
+
 public:
-    bool checkConflict(const vector<pair<int, int>>& queens, int i, int j) { // 记录已放置皇后的位置，通过坐标判断是否有冲突, 时间复杂度: N!
-        for (auto &queen : queens) {
-            if (queen.first == i || queen.second == j) {
-                return true;
-            }
-            if (abs(queen.first - i) == abs(queen.second - j)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    void subSolveNQueens(vector<string>& matrix, vector<pair<int, int>>& queens, int row) {
-        if (queens.size() == matrix.size()) {
-            res.push_back(matrix);
-            return;
-        }
-
-        for (int j = 0; j < matrix.size(); ++j) {  // 这里固定第n个皇后只能放在第row行
-            if (checkConflict(queens, row, j)) continue;
-            matrix[row][j] = 'Q';
-            queens.push_back(pair<int, int>(row, j));
-            subSolveNQueens(matrix, queens, row+1);
-            matrix[row][j] = '.';
-            queens.pop_back();
-        }
-        return;
-    }
-
     vector<vector<string>> solveNQueens(int n) {
-        if (n == 0) return res;
-        
-        vector<string> matrix = vector<string>(n, string(n, '.'));
-        vector<pair<int, int>> queens = vector<pair<int, int>>();
-        subSolveNQueens(matrix, queens, 0);
-        return res;
+        vector<string> grid(n, string(n, '.'));
+        dfs(grid, 0);
+        return result_;
     }
-
-    vector<vector<string>> res;
 };
